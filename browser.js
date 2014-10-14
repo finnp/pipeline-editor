@@ -1,12 +1,13 @@
 var request = require('browser-request')
 
 window.onload = function () {
-  var button = document.querySelector('#submit')
-  button.onclick = function () {
+  var form = document.querySelector('form')
+  form.onsubmit = function () {
     console.log('submit')
+    var cmd = document.querySelector('#input').value || ''
     var opts = {
       method: 'POST',
-      json: {cmd:'cat test.ndjson'},
+      json: {cmd: cmd},
       url: '/',
     }
     request(opts,function (err, response, body) {
@@ -14,5 +15,6 @@ window.onload = function () {
         // Use EventSource instead?
         document.querySelector('#result').innerHTML = response.response
     })
+    return false
   }
 }

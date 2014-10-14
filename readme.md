@@ -1,10 +1,12 @@
 # pipeline-ui
 
-UI for creating pipelines and viewing the output. Inspired by Open Refine and
+This is a prototype for a UI for creating pipelines and viewing the output. Inspired by Open Refine and
 IPython Notebook.
 
+Example command: ```cat test.csv | csv-parser | jsonmap "this.fluffy = this.fluffy == 1 ? 'yes' : 'no'"```
+
 ## Ideas
-- The tool runs in a webbrowser
+- The tool runs in a webbrowser (or atom shell?)
 - There is a field, where you can input the pipeline in UNIX style
   - e.g. curl random.org | parse | transform
 - The output of the last command in the pipeline should be NDJSON or CSV, which then gets displayed in the UI table

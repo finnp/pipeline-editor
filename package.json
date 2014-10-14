@@ -17,5 +17,8 @@
     "ndjson": "^1.2.3",
     "ndjson2table": "^1.0.0",
     "open": "0.0.5"
+  },
+  "devDependencies": {
+    "browserify": "^6.1.0"
   }
 }
