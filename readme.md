@@ -1,4 +1,4 @@
-# pipeline-ui
+# pipeline-editor
 
 This is a prototype for a UI for creating pipelines and viewing the output. Inspired by Open Refine and
 IPython Notebook.
@@ -11,12 +11,10 @@ Example command: ```cat test.csv | csv-parser | jsonmap "this.fluffy = this.fluf
 
 ## Ideas
 - The tool runs in a webbrowser (or atom shell?)
-- There is a field, where you can input the pipeline in UNIX style
+- There is a field, where you can input the UNIX / gasket pipeline
   - e.g. curl random.org | parse | transform
+  - However there shoudl be an abstraction layer around it, so that it is more like point and click for the user similar to http://gulpfiction.divshot.io/ 
+- Every step in the pipeline might be cached so that it is possible to rerun commands from a certain point (similar to IPython notebook).
+   - This would be handy if the source of the data is slow
 - The output of the last command in the pipeline should be NDJSON or CSV, which then gets displayed in the UI table
-- Run the whole pipeline, it might cache the results of the steps of the pipeline, so that you can re-run only parts from it
-- It doesn't have to be UNIX styled pipelines for the user. Rather it should look like click, drag'n'drop and happiness
-  - but under the hood it is Gasket / UNIX pipelines / datscript (?)
-- Sources can be: Webpages, Files..
-- It should be for sketching pipelines in a playful manner. Therefore it could use only a head of the source in the beginning
-- Inspiration for the pipeline UI: http://gulpfiction.divshot.io/
+- Since it is mainly for sketching a pipeline, it could by default limit the input stream, so that it's quick to use
