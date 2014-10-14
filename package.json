@@ -4,13 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "browserify browser.js > bundle.js && node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body": "^4.5.0",
+    "browser-request": "^0.3.2",
     "csv-write-stream": "^0.2.1",
-    "ndjson": "^1.2.3"
+    "csv2html": "0.0.1",
+    "ndjson": "^1.2.3",
+    "ndjson2table": "^1.0.0",
+    "open": "0.0.5"
   }
 }
