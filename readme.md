@@ -3,6 +3,8 @@
 This is a prototype for a UI for creating pipelines and viewing the output. Inspired by Open Refine and
 IPython Notebook.
 
+Clone this repo and `npm install` and `npm start` to test it.
+
 ![screenshot](screen.png)
 
 Example command: ```cat test.csv | csv-parser | jsonmap "this.fluffy = this.fluffy == 1 ? 'yes' : 'no'"```
