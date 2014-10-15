@@ -14,8 +14,9 @@
     "browser-request": "^0.3.2",
     "csv-write-stream": "^0.2.1",
     "csv2html": "0.0.1",
+    "gasket": "^1.2.3",
     "ndjson": "^1.2.3",
-    "ndjson2table": "^1.0.0",
+    "ndjson2table": "^1.0.1",
     "open": "0.0.5"
   },
   "devDependencies": {

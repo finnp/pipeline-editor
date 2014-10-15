@@ -4,7 +4,7 @@ var body = require('body/json')
 var exec = require('child_process').exec
 var ndjson = require('ndjson')
 var totable = require('ndjson2table')
-
+var gasket = require('gasket')
 
 // require('open')('http://localhost:2600')
 
@@ -15,11 +15,10 @@ http.createServer(function (req,res) {
   if(req.method === 'POST') {
     body(req, function (err, body) {
       if(err) return console.error(err)
-      console.error(body.cmd)
-      exec(body.cmd).stdout
-      .pipe(ndjson.parse())
-      .pipe(totable())
-      .pipe(res)
+      gasket(body.cmd.split('|')).run('main')
+        .pipe(ndjson.parse({strict: false}))
+        .pipe(totable())
+        .pipe(res)
     })
   } else {
     fs.createReadStream('./index.html')
