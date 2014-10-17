@@ -15,7 +15,8 @@ http.createServer(function (req,res) {
   if(req.method === 'POST') {
     body(req, function (err, body) {
       if(err) return console.error(err)
-      gasket(body.cmd.split('|')).run('main')
+        console.log(body.cmd)
+      gasket(body.cmd).run('main')
         .pipe(ndjson.parse({strict: false}))
         .pipe(totable())
         .pipe(res)
