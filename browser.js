@@ -8,12 +8,14 @@ window.onload = function () {
     function addToPipeline(text) {
       var ul = document.querySelector('#commands') 
       var li = document.createElement('li')
+      li.setAttribute('contenteditable', true)
       li.appendChild(document.createTextNode(text))
       ul.appendChild(li)
     }
     
     console.log('submit')
     var cmd = document.querySelector('#input').value
+    document.querySelector('#input').value = ''
     addToPipeline(cmd)
     var lis = document.querySelectorAll('#commands li')
     var commands = []
