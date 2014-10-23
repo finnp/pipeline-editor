@@ -9,6 +9,16 @@ Clone this repo and `npm install` and `npm start` to test it.
 
 Example command: ```cat test.csv | csv-parser | jsonmap "this.fluffy = this.fluffy == 1 ? 'yes' : 'no'"```
 
+
+[{"questionPrompt":"Are you working?","answeredOptions":["No"]},
+{"tokens":["Creating white noise music."],"questionPrompt":"What are you doing?"},
+{"questionPrompt":"Where are you?"},{"questionPrompt":"Who are you with?"}]
+
+{
+  "Are you working?": ["No"]
+  "What are you doing?": ["Creating white noise music"]
+}
+
 ## Ideas
 - The tool runs in a webbrowser (or atom shell?)
 - There is a field, where you can input the UNIX / gasket pipeline
