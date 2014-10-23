@@ -1,4 +1,5 @@
 var request = require('browser-request')
+var totable = require('htmltable')
 
 window.onload = function () {
 
@@ -21,7 +22,7 @@ window.onload = function () {
     evaluate()
     return false
   }
-
+  
   function evaluate() {
     var lis = document.querySelectorAll('#commands li')
     var commands = []
@@ -35,7 +36,16 @@ window.onload = function () {
     }
     request(opts,function (err, response, body) {
         // Use EventSource instead?
-        document.querySelector('#result').innerHTML = response.response
+        // document.querySelector('#result').innerHTML = response.response
+        var source = new EventSource('/sse')
+        source.onmessage = function (e) {
+          var message = JSON.parse(e.data)
+          console.log(message)
+        }
+        
+        source.onerror = function (e) {
+          source.close() // when the connection is closed
+        }
     })
     return false
   }

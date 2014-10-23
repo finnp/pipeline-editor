@@ -3,13 +3,12 @@ var fs = require('fs')
 var body = require('body/json')
 var exec = require('child_process').exec
 var ndjson = require('ndjson')
-var totable = require('ndjson2table')
 var gasket = require('gasket')
 var peek = require('peek-stream')
 var csv = require('csv-parser')
-var pumpify = require('pumpify')
 var passthrough = require('stream').PassThrough
 var path = require('path')
+var through = require('through2')
 
 
 var isCSV = function(data) {
@@ -25,31 +24,47 @@ var isJSON = function(data) {
   }
 }
 
-var render = function() {
+var parse = function() {
   return peek(function(data, swap) {
     // maybe it is JSON?
-    if (isJSON(data)) return swap(null, pumpify(ndjson.parse({strict: false}), totable()))
+    if (isJSON(data)) return swap(null, ndjson.parse({strict: false}))
 
     // maybe it is CSV?
-    if (isCSV(data)) return swap(null, pumpify(csv(),totable()))
+    if (isCSV(data)) return swap(null, csv())
 
     // pass through everything else
     swap(null, new passthrough())
   })
 }
 
+
+
+var cmd = []
+
 module.exports = function (port) {
   http.createServer(function (req,res) {
     if(req.url === '/bundle.js')
       return fs.createReadStream(path.resolve(__dirname, 'bundle.js')).pipe(res)
+      
+    if(req.url === '/sse') {
+      res.setHeader('Content-Type', 'text/event-stream')
+      console.log('Run ', cmd.join(' | '))
+      gasket(cmd).run('main')
+        .pipe(parse())
+        .pipe(through.obj(function (data, enc, cb) {
+          this.push('data: ' + JSON.stringify(data) + '\n\n')
+          cb(null)
+        }))
+        .pipe(res)
+      return
+    }
     
     if(req.method === 'POST') {
       body(req, function (err, body) {
         if(err) return console.error(err)
-        console.log('Run ', body.cmd.join(' | '))
-        gasket(body.cmd).run('main')
-          .pipe(render())
-          .pipe(res)
+        cmd = body.cmd
+        res.write('end')
+        res.end()
       })
     } else {
       fs.createReadStream(path.resolve(__dirname, 'index.html'))
