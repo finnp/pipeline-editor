@@ -9,6 +9,8 @@ var csv = require('csv-parser')
 var passthrough = require('stream').PassThrough
 var path = require('path')
 var through = require('through2')
+var split = require('split')
+var pumpify = require('pumpify')
 
 
 var isCSV = function(data) {
@@ -33,7 +35,15 @@ var parse = function() {
     if (isCSV(data)) return swap(null, csv())
 
     // pass through everything else
-    swap(null, new passthrough())
+    
+    var fallback = pumpify.obj(
+      split(),
+      through.obj(function (chunk, enc, cb) {
+        cb(null, {row: chunk})
+      })
+    )
+
+    swap(null, fallback)
   })
 }
 
