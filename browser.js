@@ -32,11 +32,13 @@ window.onload = function () {
     var opts = {
       method: 'POST',
       json: {cmd: commands},
-      url: '/',
+      url: '/'
     }
     request(opts,function (err, response, body) {
         var source = new EventSource('/sse')
-        var tablestream = totable('#result')
+        var result = document.querySelector('#result')
+        if (result.firstChild) result.removeChild(result.firstChild)
+        var tablestream = totable(result)
         source.onmessage = function (e) {
           var message = JSON.parse(e.data)
           tablestream.write(message)
