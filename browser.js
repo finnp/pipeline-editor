@@ -35,15 +35,15 @@ window.onload = function () {
       url: '/',
     }
     request(opts,function (err, response, body) {
-        // Use EventSource instead?
-        // document.querySelector('#result').innerHTML = response.response
         var source = new EventSource('/sse')
+        var tablestream = totable('#result')
         source.onmessage = function (e) {
           var message = JSON.parse(e.data)
-          console.log(message)
+          tablestream.write(message)
         }
         
         source.onerror = function (e) {
+          tablestream.end()
           source.close() // when the connection is closed
         }
     })
