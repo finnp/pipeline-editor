@@ -7,6 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "browserify browser.js > bundle.js && node index.js"
   },
+  "bin": {
+    "pipeline-editor": "./cli.js"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {

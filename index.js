@@ -9,8 +9,8 @@ var peek = require('peek-stream')
 var csv = require('csv-parser')
 var pumpify = require('pumpify')
 var passthrough = require('stream').PassThrough
+var path = require('path')
 
-// require('open')('http://localhost:2600')
 
 var isCSV = function(data) {
   return data.toString().indexOf(',') > -1
@@ -38,21 +38,23 @@ var render = function() {
   })
 }
 
-http.createServer(function (req,res) {
-  if(req.url === '/bundle.js')
-    return fs.createReadStream('./bundle.js').pipe(res)
-  
-  if(req.method === 'POST') {
-    body(req, function (err, body) {
-      if(err) return console.error(err)
-        console.log(body.cmd)
-      gasket(body.cmd).run('main')
-        .pipe(render())
+module.exports = function (port) {
+  http.createServer(function (req,res) {
+    if(req.url === '/bundle.js')
+      return fs.createReadStream(path.resolve(__dirname, 'bundle.js')).pipe(res)
+    
+    if(req.method === 'POST') {
+      body(req, function (err, body) {
+        if(err) return console.error(err)
+        console.log('Run ', body.cmd.join(' | '))
+        gasket(body.cmd).run('main')
+          .pipe(render())
+          .pipe(res)
+      })
+    } else {
+      fs.createReadStream(path.resolve(__dirname, 'index.html'))
         .pipe(res)
-    })
-  } else {
-    fs.createReadStream('./index.html')
-      .pipe(res)
-  }
-}).listen(2600)
-console.log('Listening on port 2600')
+    }
+  }).listen(port)
+}
+
