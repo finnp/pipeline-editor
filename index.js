@@ -51,6 +51,17 @@ var parse = function() {
 
 var cmd = []
 
+function getSourceCmd(source, sourcetype) {
+  // TODO: This should be npm command line tools
+  if(sourcetype === 'get')
+    return 'curl ' + source
+  
+  if(sourcetype === 'file')
+    return 'cat ' + source
+  
+  return source
+}
+
 module.exports = function (port) {
   http.createServer(function (req,res) {
     if(req.url === '/bundle.js')
@@ -73,6 +84,7 @@ module.exports = function (port) {
       body(req, function (err, body) {
         if(err) return console.error(err)
         cmd = body.cmd
+        cmd.unshift(getSourceCmd(body.source, body.sourcetype))
         res.write('end')
         res.end()
       })
