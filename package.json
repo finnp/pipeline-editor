@@ -20,7 +20,7 @@
     "csv2html": "0.0.1",
     "event-source-stream": "^1.1.1",
     "gasket": "^1.2.3",
-    "htmltable": "^1.1.0",
+    "htmltable": "^1.2.0",
     "ndjson": "^1.2.3",
     "ndjson2table": "^1.0.1",
     "open": "0.0.5",

@@ -34,9 +34,13 @@
     <script src="bundle.js"></script>
   </head>
   <body>
+  <select id="sourcetype">
+    <option value="get">Webresource URL</option>
+    <option value="file">File name / path</option>
+    <option value="command">Command</option>
+  </select>
+  <input id="source" name="source" />
     <ol id="commands">
-      <!-- <li>cat test.csv</li>
-      <li>csv-parser</li> -->
       <li><form action="#">
         <input id="input" name="input"/>
       </form>

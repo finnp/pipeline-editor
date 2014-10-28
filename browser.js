@@ -28,10 +28,17 @@ window.onload = function () {
     var commands = []
     for(var i = 0; i < (lis.length - 1); i++)
       commands.push(lis[i].firstChild.nodeValue)
+      
+    var sourcetype = document.getElementById('sourcetype').value
+    var source = document.getElementById('source').value
 
     var opts = {
       method: 'POST',
-      json: {cmd: commands},
+      json: {
+        cmd: commands,
+        sourcetype: sourcetype,
+        source: source
+      },
       url: '/'
     }
     request(opts,function (err, response, body) {
