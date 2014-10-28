@@ -3,30 +3,22 @@ var totable = require('htmltable')
 
 window.onload = function () {
 
-  var evaluateButton = document.querySelector('#evaluate')
-  var form = document.querySelector('form')
+  var addRowButton = document.querySelector('#add')
   
-  function addToPipeline(text) {
-    var lastli = document.querySelector('#commands li:last-child') 
-    var ul = lastli.parentNode
+  addRowButton.onclick = function () {
+    var ul = document.querySelector('#commands')
     var li = document.createElement('li')
     li.setAttribute('contenteditable', true)
-    li.appendChild(document.createTextNode(text))
-    ul.insertBefore(li, lastli)
+    li.appendChild(document.createTextNode(''))
+    ul.appendChild(li)
   }
   
-  form.onsubmit = function () {
-    var cmd = document.querySelector('#input').value
-    document.querySelector('#input').value = ''
-    addToPipeline(cmd)
-    evaluate()
-    return false
-  }
+  var evaluateButton = document.querySelector('#evaluate')
   
   function evaluate() {
     var lis = document.querySelectorAll('#commands li')
     var commands = []
-    for(var i = 0; i < (lis.length - 1); i++)
+    for(var i = 0; i < lis.length; i++)
       commands.push(lis[i].firstChild.nodeValue)
       
     var sourcetype = document.getElementById('sourcetype').value
