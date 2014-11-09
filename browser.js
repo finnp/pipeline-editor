@@ -26,9 +26,25 @@ window.onload = function () {
   
   var evaluateButton = document.querySelector('#evaluate')
   
+  
+  function getSourceCmd(source, sourcetype) {
+    // TODO: This should be npm command line tools
+    if(sourcetype === 'get')
+      return 'curl ' + source
+    
+    if(sourcetype === 'file')
+      return 'cat ' + source
+    
+    return source
+  }
+  
   function getPipeline() {
+    var source = getSourceCmd(
+      document.querySelector('#source').value, 
+      document.querySelector('#sourcetype').value
+    )
     var inputs = document.querySelectorAll('#commands li:not(.hidden) input')
-    var commands = []
+    var commands = [source]
     for(var i = 0; i < inputs.length; i++)
       commands.push(inputs[i].value)
     return commands
