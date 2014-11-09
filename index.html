@@ -47,10 +47,15 @@
       padding: 0;
       margin: 0;
     }
-    #commands li {
-      padding: 3px;
-      border: 1px solid black;
+    #commands li, .source {
+      padding: 5px;
+      border: 2px solid #336699;
     }
+    
+    #commands li {
+      margin-top: 20px;
+    }
+
     
     #commands form {
       padding: 0;
@@ -61,26 +66,30 @@
       width: 100%;
     }
     
-    #add {
+    #add, #evaluate {
       width: 100%;
     }
     
     .hidden {
       display: none;
     }
+    
+    #sourcetype, #source {
+      width: 100%
+    }
     </style>
     <script src="bundle.js"></script>
   </head>
   <body>
   <div id="steps">
-    <select id="sourcetype">
-      <option value="file">File name / path</option>
-      <option value="get">Webresource URL</option>
-      <option value="command">Command</option>
-    </select>
-    <input id="source" name="source" value="test.ndjson" />
-    <br/>
-    <br/>
+    <div class="source">
+      <select id="sourcetype">
+        <option value="file">File name / path</option>
+        <option value="get">Webresource URL</option>
+        <option value="command">Command</option>
+      </select>
+      <input id="source" name="source" value="test.ndjson" />
+    </div>
       <ol id="commands">
       <li class="hidden"><input /><button class="remove">-</button></li>
       </ol>
