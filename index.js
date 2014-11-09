@@ -12,7 +12,8 @@ var through = require('through2')
 var split = require('split')
 var pumpify = require('pumpify')
 var tmp = require('tmp')
-
+var url = require('url')
+var qs = require('querystring')
 
 var isCSV = function(data) {
   return data.toString().indexOf(',') > -1
@@ -49,18 +50,24 @@ var parse = function() {
 }
 
 
-
-var cmd = []
-
-
-function sse(res) {
+function sseRoute(res, reqUrl) {
+  
   res.setHeader('Content-Type', 'text/event-stream')
+  
+  var cmd
+  try {
+    cmd = JSON.parse(qs.parse(reqUrl.query).commands)
+  } catch(e) {
+    console.error('Parse error')
+    return res.end()
+  }
+  
   console.log('Run ', cmd.join(' | '))
   
   // TODO: this doesn't seem to cleanup correctly
   tmp.dir({unsafeCleanup: true}, function (err, tmpPath) {
     if(err) throw err
-      console.log(tmpPath)
+    //  console.log(tmpPath)
     
     // insert caching
     var pipeline = cmd.reduce(function (pre, curr, i) {
@@ -78,30 +85,21 @@ function sse(res) {
       .pipe(res)
     
   })
-  
 
 }
 
 module.exports = function (port) {
   http.createServer(function (req,res) {
-    if(req.url === '/bundle.js')
+    var reqUrl = url.parse(req.url)
+    var route = reqUrl.pathname
+    if(route === '/bundle.js')
       return fs.createReadStream(path.resolve(__dirname, 'bundle.js')).pipe(res)
-      
-    if(req.url === '/sse') {
-      return sse(res)
-    } 
+  
+    if(route === '/sse') 
+      return sseRoute(res, reqUrl)
     
-    if(req.method === 'POST') {
-      body(req, function (err, body) {
-        if(err) return console.error(err)
-        cmd = body.cmd
-        res.write('end')
-        res.end()
-      })
-    } else {
-      fs.createReadStream(path.resolve(__dirname, 'index.html'))
-        .pipe(res)
-    }
+    if(route === '/')
+      return fs.createReadStream(path.resolve(__dirname, 'index.html')).pipe(res)
   }).listen(port)
 }
 

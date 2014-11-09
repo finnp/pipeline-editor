@@ -53,33 +53,21 @@ window.onload = function () {
   function evaluate() {
     var commands = getPipeline()
       
-    var sourcetype = document.getElementById('sourcetype').value
-    var source = document.getElementById('source').value
+    var qs = '?commands=' + encodeURIComponent(JSON.stringify(commands))
 
-    var opts = {
-      method: 'POST',
-      json: {
-        cmd: commands,
-        sourcetype: sourcetype,
-        source: source
-      },
-      url: '/'
+    var source = new EventSource('/sse' + qs)
+    var result = document.querySelector('#result')
+    if (result.firstChild) result.removeChild(result.firstChild)
+    var tablestream = totable(result)
+    source.onmessage = function (e) {
+      var message = JSON.parse(e.data)
+      tablestream.write(message)
     }
-    request(opts,function (err, response, body) {
-        var source = new EventSource('/sse')
-        var result = document.querySelector('#result')
-        if (result.firstChild) result.removeChild(result.firstChild)
-        var tablestream = totable(result)
-        source.onmessage = function (e) {
-          var message = JSON.parse(e.data)
-          tablestream.write(message)
-        }
-        
-        source.onerror = function (e) {
-          tablestream.end()
-          source.close() // when the connection is closed
-        }
-    })
+    
+    source.onerror = function (e) {
+      tablestream.end()
+      source.close() // when the connection is closed
+    }
     return false
   }
 
