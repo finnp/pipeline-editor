@@ -11,6 +11,7 @@ var path = require('path')
 var through = require('through2')
 var split = require('split')
 var pumpify = require('pumpify')
+var tmp = require('tmp')
 
 
 var isCSV = function(data) {
@@ -51,23 +52,44 @@ var parse = function() {
 
 var cmd = []
 
+
+function sse(res) {
+  res.setHeader('Content-Type', 'text/event-stream')
+  console.log('Run ', cmd.join(' | '))
+  
+  // TODO: this doesn't seem to cleanup correctly
+  tmp.dir({unsafeCleanup: true}, function (err, tmpPath) {
+    if(err) throw err
+      console.log(tmpPath)
+    
+    // insert caching
+    var pipeline = cmd.reduce(function (pre, curr, i) {
+      pre.push(curr)
+      pre.push('save-through ' + path.resolve(tmpPath, i + '.cache'))
+      return pre
+    }, [])
+
+    gasket(pipeline).run('main')
+      .pipe(parse())
+      .pipe(through.obj(function (data, enc, cb) {
+        this.push('data: ' + JSON.stringify(data) + '\n\n')
+        cb(null)
+      }))
+      .pipe(res)
+    
+  })
+  
+
+}
+
 module.exports = function (port) {
   http.createServer(function (req,res) {
     if(req.url === '/bundle.js')
       return fs.createReadStream(path.resolve(__dirname, 'bundle.js')).pipe(res)
       
     if(req.url === '/sse') {
-      res.setHeader('Content-Type', 'text/event-stream')
-      console.log('Run ', cmd.join(' | '))
-      gasket(cmd).run('main')
-        .pipe(parse())
-        .pipe(through.obj(function (data, enc, cb) {
-          this.push('data: ' + JSON.stringify(data) + '\n\n')
-          cb(null)
-        }))
-        .pipe(res)
-      return
-    }
+      return sse(res)
+    } 
     
     if(req.method === 'POST') {
       body(req, function (err, body) {
