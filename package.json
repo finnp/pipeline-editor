@@ -19,6 +19,7 @@
     "csv-parser": "^1.4.6",
     "csv-write-stream": "^0.2.1",
     "csv2html": "0.0.1",
+    "element-class": "^0.2.0",
     "event-source-stream": "^1.1.1",
     "gasket": "^1.2.3",
     "htmltable": "^1.2.0",

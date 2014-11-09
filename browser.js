@@ -1,6 +1,7 @@
 var request = require('browser-request')
 var totable = require('htmltable')
 var saveJSON = require('./lib/downloadjson.js')
+var elementClass = require('element-class')
 
 window.onload = function () {
   
@@ -18,9 +19,7 @@ window.onload = function () {
     var ul = document.querySelector('#commands')
     
     var removeButton = li.querySelector('.remove')
-    removeButton.onclick = function () {
-      ul.removeChild(li)
-    }
+    removeButton.onclick = remove.bind(null, ul, li)
     
     var peekButton = li.querySelector('.peek')
     peekButton.onclick = peek
@@ -29,10 +28,22 @@ window.onload = function () {
     ul.appendChild(li)
   }
   
-  function peek(e) {
+  function positionFromButton(button) {
     var pos = -2 // offset
-    var li = e.target.parentNode
+    var li = button.parentNode
     while (li = li.previousSibling) ++pos
+    return pos
+  }
+
+  function remove(ul, li, e) {
+    var pos = positionFromButton(e.target)
+    hidePeekButtonsFrom(pos)
+    ul.removeChild(li)
+  }
+
+  
+  function peek(e) {
+    var pos = positionFromButton(e.target)
     
     renderTable(new EventSource('/sse?peek=' + pos))
   }
@@ -63,10 +74,28 @@ window.onload = function () {
     return commands
   }
   
+  
+  function hidePeekButtonsFrom(i) {
+    var peeks = document.querySelectorAll('.peek')
+    while(i < peeks.length && i++) {
+      if(peeks[i]) elementClass(peeks[i]).add('hidden')
+    }
+  }
+  
+  function showPeekButtons() {
+    // make peek button visible
+    var peeks = document.querySelectorAll('.peek')
+    for(var i = 0; i < peeks.length; i++) {
+      elementClass(peeks[i]).remove('hidden')
+    }
+  }
+  
   function evaluate() {
     var commands = getPipeline()
       
     var qs = '?commands=' + encodeURIComponent(JSON.stringify(commands))
+    
+    showPeekButtons()
 
     renderTable(new EventSource('/sse' + qs))
 
