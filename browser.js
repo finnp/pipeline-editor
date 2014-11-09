@@ -16,12 +16,25 @@ window.onload = function () {
   addRowButton.onclick = function () {
     var li = document.querySelector('#commands li.hidden').cloneNode(true)
     var ul = document.querySelector('#commands')
+    
     var removeButton = li.querySelector('.remove')
     removeButton.onclick = function () {
-      li.className = 'hidden' // TODO: Actually properly delete it
+      ul.removeChild(li)
     }
+    
+    var peekButton = li.querySelector('.peek')
+    peekButton.onclick = peek
+    
     li.className = '' // remove hidden
     ul.appendChild(li)
+  }
+  
+  function peek(e) {
+    var pos = -2 // offset
+    var li = e.target.parentNode
+    while (li = li.previousSibling) ++pos
+    
+    renderTable(new EventSource('/sse?peek=' + pos))
   }
   
   var evaluateButton = document.querySelector('#evaluate')
@@ -55,7 +68,12 @@ window.onload = function () {
       
     var qs = '?commands=' + encodeURIComponent(JSON.stringify(commands))
 
-    var source = new EventSource('/sse' + qs)
+    renderTable(new EventSource('/sse' + qs))
+
+    return false
+  }
+  
+  function renderTable(source) {
     var result = document.querySelector('#result')
     if (result.firstChild) result.removeChild(result.firstChild)
     var tablestream = totable(result)
@@ -68,9 +86,7 @@ window.onload = function () {
       tablestream.end()
       source.close() // when the connection is closed
     }
-    return false
   }
-
 
   evaluateButton.onclick = evaluate
 }
