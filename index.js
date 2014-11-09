@@ -1,54 +1,28 @@
 var http = require('http')
 var fs = require('fs')
-var body = require('body/json')
-var exec = require('child_process').exec
-var ndjson = require('ndjson')
-var gasket = require('gasket')
-var peek = require('peek-stream')
-var csv = require('csv-parser')
-var passthrough = require('stream').PassThrough
 var path = require('path')
-var through = require('through2')
-var split = require('split')
-var pumpify = require('pumpify')
-var tmp = require('tmp')
 var url = require('url')
 var qs = require('querystring')
+var through = require('through2')
 
-var isCSV = function(data) {
-  return data.toString().indexOf(',') > -1
-}
-
-var isJSON = function(data) {
-  try {
-    JSON.parse(data)
-    return true
-  } catch (err) {
-    return false
-  }
-}
-
-var parse = function() {
-  return peek(function(data, swap) {
-    // maybe it is JSON?
-    if (isJSON(data)) return swap(null, ndjson.parse({strict: false}))
-
-    // maybe it is CSV?
-    if (isCSV(data)) return swap(null, csv())
-
-    // pass through everything else
+module.exports = function (port) {
+  var tmp = require('tmp')
+  tmp.dir({unsafeCleanup: true}, function (err, tmpPath) {
+    if(err) throw err
+    http.createServer(function (req,res) {
+      var reqUrl = url.parse(req.url)
+      var route = reqUrl.pathname
+      if(route === '/bundle.js')
+        return fs.createReadStream(path.resolve(__dirname, 'bundle.js')).pipe(res)
     
-    var fallback = pumpify.obj(
-      split(),
-      through.obj(function (chunk, enc, cb) {
-        cb(null, {row: chunk})
-      })
-    )
-
-    swap(null, fallback)
+      if(route === '/sse') 
+        return sseRoute(res, reqUrl, tmpPath)
+      
+      if(route === '/')
+        return fs.createReadStream(path.resolve(__dirname, 'index.html')).pipe(res)
+    }).listen(port)
   })
 }
-
 
 function runFull(commands, tmpPath) {
   var cmd
@@ -68,7 +42,7 @@ function runFull(commands, tmpPath) {
     return pre
   }, [])
 
-  return gasket(pipeline).run('main')
+  return require('gasket')(pipeline).run('main')
 }
 
 function peekStep(peekPosition, tmpPath) {
@@ -87,7 +61,8 @@ function sseRoute(res, reqUrl, tmpPath) {
     sourceStream = runFull(query.commands, tmpPath)
   else if('peek' in query)
     sourceStream = peekStep(query.peek, tmpPath)
-  
+    
+  var parse = require('./lib/text2objectstream.js')
   sourceStream
     .pipe(parse())
     .pipe(through.obj(function (data, enc, cb) {
@@ -95,22 +70,4 @@ function sseRoute(res, reqUrl, tmpPath) {
       cb(null)
     }))
     .pipe(res)
-}
-
-module.exports = function (port) {
-  tmp.dir({unsafeCleanup: true}, function (err, tmpPath) {
-    if(err) throw err
-    http.createServer(function (req,res) {
-      var reqUrl = url.parse(req.url)
-      var route = reqUrl.pathname
-      if(route === '/bundle.js')
-        return fs.createReadStream(path.resolve(__dirname, 'bundle.js')).pipe(res)
-    
-      if(route === '/sse') 
-        return sseRoute(res, reqUrl, tmpPath)
-      
-      if(route === '/')
-        return fs.createReadStream(path.resolve(__dirname, 'index.html')).pipe(res)
-    }).listen(port)
-  })
 }
