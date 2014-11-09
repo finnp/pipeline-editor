@@ -1,25 +1,29 @@
 var request = require('browser-request')
 var totable = require('htmltable')
 
+
 window.onload = function () {
 
   var addRowButton = document.querySelector('#add')
   
   addRowButton.onclick = function () {
+    var li = document.querySelector('#commands li.hidden').cloneNode(true)
     var ul = document.querySelector('#commands')
-    var li = document.createElement('li')
-    li.setAttribute('contenteditable', true)
-    li.appendChild(document.createTextNode(''))
+    var removeButton = li.querySelector('.remove')
+    removeButton.onclick = function () {
+      li.className = 'hidden' // TODO: Actually properly delete it
+    }
+    li.className = '' // remove hidden
     ul.appendChild(li)
   }
   
   var evaluateButton = document.querySelector('#evaluate')
   
   function evaluate() {
-    var lis = document.querySelectorAll('#commands li')
+    var inputs = document.querySelectorAll('#commands li:not(.hidden) input')
     var commands = []
-    for(var i = 0; i < lis.length; i++)
-      commands.push(lis[i].firstChild.nodeValue)
+    for(var i = 0; i < inputs.length; i++)
+      commands.push(inputs[i].value)
       
     var sourcetype = document.getElementById('sourcetype').value
     var source = document.getElementById('source').value

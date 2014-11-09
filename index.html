@@ -64,6 +64,10 @@
     #add {
       width: 100%;
     }
+    
+    .hidden {
+      display: none;
+    }
     </style>
     <script src="bundle.js"></script>
   </head>
@@ -77,7 +81,9 @@
     <input id="source" name="source" value="test.ndjson" />
     <br/>
     <br/>
-      <ol id="commands"></ol>
+      <ol id="commands">
+      <li class="hidden"><input /><button class="remove">-</button></li>
+      </ol>
       <button id="add">+</button><br>
 
       <button id="evaluate">Run</button>
