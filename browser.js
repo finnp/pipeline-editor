@@ -8,7 +8,7 @@ window.onload = function () {
   
   exportButton.onclick = function () {
     var commands = getPipeline()
-    saveJSON({gasket: commands}, 'gasket.json')
+    saveJSON({main: commands}, 'gasket.json')
   }
 
   var addRowButton = document.querySelector('#add')
