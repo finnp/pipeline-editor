@@ -1,8 +1,15 @@
 var request = require('browser-request')
 var totable = require('htmltable')
-
+var saveJSON = require('./lib/downloadjson.js')
 
 window.onload = function () {
+  
+  var exportButton = document.querySelector('#export')
+  
+  exportButton.onclick = function () {
+    var commands = getPipeline()
+    saveJSON({gasket: commands}, 'gasket.json')
+  }
 
   var addRowButton = document.querySelector('#add')
   
@@ -19,11 +26,16 @@ window.onload = function () {
   
   var evaluateButton = document.querySelector('#evaluate')
   
-  function evaluate() {
+  function getPipeline() {
     var inputs = document.querySelectorAll('#commands li:not(.hidden) input')
     var commands = []
     for(var i = 0; i < inputs.length; i++)
       commands.push(inputs[i].value)
+    return commands
+  }
+  
+  function evaluate() {
+    var commands = getPipeline()
       
     var sourcetype = document.getElementById('sourcetype').value
     var source = document.getElementById('source').value
