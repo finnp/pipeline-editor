@@ -61,13 +61,13 @@ function sseRoute(res, reqUrl, tmpPath) {
     sourceStream = runFull(query.commands, tmpPath)
   else if('peek' in query)
     sourceStream = peekStep(query.peek, tmpPath)
+  else 
+    return res.end()
     
   var parse = require('./lib/text2objectstream.js')
+  var toServerSentEvents = require('./lib/tosse.js')
   sourceStream
     .pipe(parse())
-    .pipe(through.obj(function (data, enc, cb) {
-      this.push('data: ' + JSON.stringify(data) + '\n\n')
-      cb(null)
-    }))
+    .pipe(toServerSentEvents())
     .pipe(res)
 }
