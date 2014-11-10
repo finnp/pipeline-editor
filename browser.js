@@ -11,6 +11,10 @@ window.onload = function () {
   
   var exportButton = $('#export')
   
+  // init first peek button
+  var peekButton = document.querySelector('.peek')
+  peekButton.onclick = peek
+  
   exportButton.onclick = function () {
     var commands = getPipeline()
     saveJSON({main: commands}, 'gasket.json')
@@ -27,8 +31,8 @@ window.onload = function () {
     
     var peekButton = li.querySelector('.peek')
     peekButton.onclick = peek
-    
-    li.className = '' // remove hidden
+
+    elementClass(li).remove('hidden')
     ul.appendChild(li)
   }
   
@@ -36,6 +40,7 @@ window.onload = function () {
     var pos = -2 // offset
     var li = button.parentNode
     while (li = li.previousSibling) ++pos
+    if(pos < 0) pos = 0
     return pos
   }
 
@@ -50,6 +55,7 @@ window.onload = function () {
     var lis = $All('#commands li')
     for(var i = 0; i < lis.length; i++)
       elementClass(lis[i]).remove('peekcurrent')
+    elementClass($('.source')).remove('peekcurrent')
     elementClass(element).add('peekcurrent')
   }
   
