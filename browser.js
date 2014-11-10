@@ -25,7 +25,7 @@ window.onload = function () {
   var tabindex = 1
   
   addRowButton.onclick = function () {
-    var li = $('#commands li.hidden').cloneNode(true)
+    var li = $('#step-template li').cloneNode(true)
     var ul = $('#commands')
 
     tabindex++
@@ -42,7 +42,7 @@ window.onload = function () {
   }
   
   function getStepPosition(li) {
-    var pos = -2 // offset
+    var pos = -2
     while (li = li.previousSibling) ++pos
     if(pos < 0) pos = 0
     return pos
@@ -51,7 +51,7 @@ window.onload = function () {
   function remove(ul, li, e) {
     var pos = getStepPosition(e.target.parentNode)
     var isCurrent = elementClass(li).has('peekcurrent')
-    if(isCurrent) markCurrentPeek(li.previousSibling)
+    if(isCurrent) markCurrentPeek(li.previousElementSibling)
     peekStep(pos - 1)
     hidePeekButtonsFrom(pos)
     ul.removeChild(li)
@@ -62,7 +62,6 @@ window.onload = function () {
     var lis = $All('#commands li')
     for(var i = 0; i < lis.length; i++)
       elementClass(lis[i]).remove('peekcurrent')
-    elementClass($('.source')).remove('peekcurrent')
     elementClass(element).add('peekcurrent')
   }
   
@@ -98,9 +97,9 @@ window.onload = function () {
       $('#source').value, 
       $('#sourcetype').value
     )
-    var inputs = $All('#commands li:not(.hidden) input')
+    var inputs = $All('#commands li input')
     var commands = [source]
-    for(var i = 0; i < inputs.length; i++)
+    for(var i = 1; i < inputs.length; i++)
       commands.push(inputs[i].value)
     return commands
   }
@@ -129,7 +128,7 @@ window.onload = function () {
     showPeekButtons()
     
     var lastElement = 
-      $('#commands li:not(.hidden):last-child')
+      $('#commands li:last-child')
       || $('.source')
     
     markCurrentPeek(lastElement)

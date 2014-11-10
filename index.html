@@ -91,20 +91,15 @@
   </head>
   <body>
   <div id="steps">
-    <div class="source">
-      <select id="sourcetype">
-        <option value="file">File name / path</option>
-        <option value="get">Webresource URL</option>
-        <option value="command">Command</option>
-      </select>
-      <input tabindex="1" id="source" name="source" value="test.ndjson" />
-      <button class="peek">peek</button>
-    </div>
       <ol id="commands">
-        <li class="hidden">
-          <input />
-          <button class="remove">-</button>
-          <button class="peek hidden">peek</button> <!-- should ony be visible after run -->
+        <li class="source">
+          <select id="sourcetype">
+            <option value="file">File name / path</option>
+            <option value="get">Webresource URL</option>
+            <option value="command">Command</option>
+          </select>
+          <input tabindex="1" id="source" name="source" value="test.ndjson" />
+          <button class="peek">peek</button>
         </li>
       </ol>
       <button id="add">+</button><br>
@@ -112,6 +107,15 @@
       <button id="evaluate">Run Complete</button><br><br>
       <button id="export">Export gasket.json</button>
   </div>
+  
+  <ol id="step-template" class="hidden">
+    <li>
+      <input />
+      <button class="remove">-</button>
+      <button class="peek hidden">peek</button> <!-- should ony be visible after run -->
+    </li>
+  </ol>
+  
   <div id="result"></div>
   </body>
 </html>
