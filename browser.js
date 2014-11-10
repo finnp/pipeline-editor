@@ -22,9 +22,14 @@ window.onload = function () {
 
   var addRowButton = $('#add')
   
+  var tabindex = 1
+  
   addRowButton.onclick = function () {
     var li = $('#commands li.hidden').cloneNode(true)
     var ul = $('#commands')
+
+    tabindex++
+    li.querySelector('input').setAttribute('tabindex', tabindex)
     
     var removeButton = li.querySelector('.remove')
     removeButton.onclick = remove.bind(null, ul, li)
