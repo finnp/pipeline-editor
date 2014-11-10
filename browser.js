@@ -45,9 +45,18 @@ window.onload = function () {
     ul.removeChild(li)
   }
 
+
+  function markCurrentPeek(element) {
+    var lis = $All('#commands li')
+    for(var i = 0; i < lis.length; i++)
+      elementClass(lis[i]).remove('peekcurrent')
+    elementClass(element).add('peekcurrent')
+  }
   
   function peek(e) {
     var pos = positionFromButton(e.target)
+    
+    markCurrentPeek(e.target.parentNode)
     
     ssejson.fromEventSource('/sse?peek=' + pos)
       .pipe(totable($('#result')))
@@ -101,6 +110,8 @@ window.onload = function () {
     var qs = '?commands=' + encodeURIComponent(JSON.stringify(commands))
     
     showPeekButtons()
+    
+    markCurrentPeek($('#commands li:last-child'))
 
     ssejson.fromEventSource('/sse' + qs)
       .pipe(totable($('#result')))
