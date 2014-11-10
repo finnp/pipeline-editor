@@ -91,6 +91,7 @@
   </head>
   <body>
   <div id="steps">
+    <button id="evaluate">Run Complete</button>
       <ol id="commands">
         <li class="source">
           <select id="sourcetype">
@@ -100,11 +101,12 @@
           </select>
           <input tabindex="1" id="source" name="source" value="test.ndjson" />
           <button class="peek">peek</button>
+          <button class="runfromhere">run from here (cached)</button>
         </li>
       </ol>
       <button id="add">+</button><br>
 
-      <button id="evaluate">Run Complete</button><br><br>
+      <br><br>
       <button id="export">Export gasket.json</button>
   </div>
   
@@ -113,6 +115,7 @@
       <input />
       <button class="remove">-</button>
       <button class="peek hidden">peek</button> <!-- should ony be visible after run -->
+      <button class="runfromhere hidden">run from here (cached)</button>
     </li>
   </ol>
   

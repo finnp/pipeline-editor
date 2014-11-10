@@ -12,8 +12,11 @@ window.onload = function () {
   var exportButton = $('#export')
   
   // init first peek button
-  var peekButton = document.querySelector('.peek')
+  var peekButton = $('.peek')
   peekButton.onclick = peekButtonEvent
+  
+  var runFromHereButton = $('.runfromhere')
+  runFromHereButton.onclick = runFromHereButtonEvent
   
   exportButton.onclick = function () {
     var commands = getPipeline()
@@ -34,8 +37,9 @@ window.onload = function () {
     var removeButton = li.querySelector('.remove')
     removeButton.onclick = remove.bind(null, ul, li)
 
-    var peekButton = li.querySelector('.peek')
-    peekButton.onclick = peekButtonEvent
+     li.querySelector('.peek').onclick = peekButtonEvent
+     li.querySelector('.runfromhere').onclick = runFromHereButtonEvent
+    
 
     elementClass(li).remove('hidden')
     ul.appendChild(li)
@@ -53,7 +57,8 @@ window.onload = function () {
     var isCurrent = elementClass(li).has('peekcurrent')
     if(isCurrent) markCurrentPeek(li.previousElementSibling)
     peekStep(pos - 1)
-    hidePeekButtonsFrom(pos)
+    hideButtonsFrom('.peek', pos)
+    hideButtonsFrom('.runfromhere', pos)
     ul.removeChild(li)
   }
 
@@ -71,6 +76,11 @@ window.onload = function () {
     markCurrentPeek(e.target.parentNode)
     
     peekStep(pos)
+  }
+  
+  function runFromHereButtonEvent(e) {
+    var pos = getStepPosition(e.target.parentNode)
+    runFrom(pos) 
   }
   
   function peekStep(pos) {
@@ -105,27 +115,25 @@ window.onload = function () {
   }
   
   
-  function hidePeekButtonsFrom(i) {
-    var peeks = $All('.peek')
-    while(i < peeks.length && i++) {
-      if(peeks[i]) elementClass(peeks[i]).add('hidden')
+  function hideButtonsFrom(selector, i) {
+    var buttons = $All(selector)
+    while(i < buttons.length && i++) {
+      if(buttons[i]) elementClass(buttons[i]).add('hidden')
     }
   }
   
-  function showPeekButtons() {
-    // make peek button visible
-    var peeks = $All('.peek')
+  function showButtons(selector) {
+    var peeks = $All(selector)
     for(var i = 0; i < peeks.length; i++) {
       elementClass(peeks[i]).remove('hidden')
     }
   }
   
   function evaluate() {
-    var commands = getPipeline()
-      
-    var qs = '?commands=' + encodeURIComponent(JSON.stringify(commands))
+    showButtons('.peek')
+    showButtons('.runfromhere')
     
-    showPeekButtons()
+    runFrom(-1) // 0 is first cache
     
     var lastElement = 
       $('#commands li:last-child')
@@ -133,10 +141,15 @@ window.onload = function () {
     
     markCurrentPeek(lastElement)
 
+    return false
+  }
+  
+  function runFrom(pos) {
+    var commands = getPipeline()
+    var qs = '?position=' + pos + '&commands=' + encodeURIComponent(JSON.stringify(commands))
+    
     ssejson.fromEventSource('/sse' + qs)
       .pipe(totable($('#result')))
-
-    return false
   }
 
 

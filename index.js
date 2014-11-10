@@ -25,7 +25,14 @@ module.exports = function (port) {
   })
 }
 
-function runFull(commands, tmpPath) {
+
+
+function peekStep(peekPosition, tmpPath) {
+  var cachePath = path.resolve(tmpPath, peekPosition + '.cache')
+  return fs.createReadStream(cachePath)
+}
+
+function runFrom(commands, position, tmpPath) {
   var cmd
   try {
     cmd = JSON.parse(commands)
@@ -33,8 +40,7 @@ function runFull(commands, tmpPath) {
     console.error('Parse error')
     return res.end()
   }
-
-  console.log('Run ', cmd.join(' | '))
+  
   
   // insert caching
   var pipeline = cmd.reduce(function (pre, curr, i) {
@@ -43,12 +49,19 @@ function runFull(commands, tmpPath) {
     return pre
   }, [])
 
-  return require('gasket')(pipeline).run('main')
-}
-
-function peekStep(peekPosition, tmpPath) {
-  var cachePath = path.resolve(tmpPath, peekPosition + '.cache')
-  return fs.createReadStream(cachePath)
+  
+  // [from, cache, step1, cache, step2]
+  pipeline = pipeline.slice((position + 1) * 2)
+  
+  
+  var cachePath = path.resolve(tmpPath, position + '.cache')
+  
+  var gasketPipeline = require('gasket')(pipeline).run('main')
+  
+  if(position >= 0)
+    return fs.createReadStream(cachePath).pipe(gasketPipeline)
+  else
+    return gasketPipeline
 }
 
 
@@ -59,7 +72,7 @@ function sseRoute(res, reqUrl, tmpPath) {
   
   var sourceStream
   if('commands' in query) 
-    sourceStream = runFull(query.commands, tmpPath)
+    sourceStream = runFrom(query.commands, Number(query.position), tmpPath)
   else if('peek' in query)
     sourceStream = peekStep(query.peek, tmpPath)
   else 
