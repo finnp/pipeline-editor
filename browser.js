@@ -2,7 +2,7 @@ var request = require('browser-request')
 var totable = require('htmltable')
 var saveJSON = require('./lib/downloadjson.js')
 var elementClass = require('element-class')
-var fromEventSource = require('fromeventsource')
+var ssejson = require('ssejson')
 
 var $ = document.querySelector.bind(document)
 var $All = document.querySelectorAll.bind(document)
@@ -49,7 +49,7 @@ window.onload = function () {
   function peek(e) {
     var pos = positionFromButton(e.target)
     
-    fromEventSource('/sse?peek=' + pos)
+    ssejson.fromEventSource('/sse?peek=' + pos)
       .pipe(totable($('#result')))
   }
   
@@ -102,7 +102,7 @@ window.onload = function () {
     
     showPeekButtons()
 
-    fromEventSource('/sse' + qs)
+    ssejson.fromEventSource('/sse' + qs)
       .pipe(totable($('#result')))
 
     return false

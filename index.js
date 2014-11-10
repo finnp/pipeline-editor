@@ -4,6 +4,7 @@ var path = require('path')
 var url = require('url')
 var qs = require('querystring')
 var through = require('through2')
+var ssejson = require('ssejson')
 
 module.exports = function (port) {
   var tmp = require('tmp')
@@ -65,9 +66,8 @@ function sseRoute(res, reqUrl, tmpPath) {
     return res.end()
     
   var parse = require('./lib/text2objectstream.js')
-  var toServerSentEvents = require('./lib/tosse.js')
   sourceStream
     .pipe(parse())
-    .pipe(toServerSentEvents())
+    .pipe(ssejson.serialize())
     .pipe(res)
 }
