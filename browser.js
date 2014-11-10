@@ -13,7 +13,7 @@ window.onload = function () {
   
   // init first peek button
   var peekButton = document.querySelector('.peek')
-  peekButton.onclick = peek
+  peekButton.onclick = peekButtonEvent
   
   exportButton.onclick = function () {
     var commands = getPipeline()
@@ -33,24 +33,26 @@ window.onload = function () {
     
     var removeButton = li.querySelector('.remove')
     removeButton.onclick = remove.bind(null, ul, li)
-    
+
     var peekButton = li.querySelector('.peek')
-    peekButton.onclick = peek
+    peekButton.onclick = peekButtonEvent
 
     elementClass(li).remove('hidden')
     ul.appendChild(li)
   }
   
-  function positionFromButton(button) {
+  function getStepPosition(li) {
     var pos = -2 // offset
-    var li = button.parentNode
     while (li = li.previousSibling) ++pos
     if(pos < 0) pos = 0
     return pos
   }
 
   function remove(ul, li, e) {
-    var pos = positionFromButton(e.target)
+    var pos = getStepPosition(e.target.parentNode)
+    var isCurrent = elementClass(li).has('peekcurrent')
+    if(isCurrent) markCurrentPeek(li.previousSibling)
+    peekStep(pos - 1)
     hidePeekButtonsFrom(pos)
     ul.removeChild(li)
   }
@@ -64,13 +66,17 @@ window.onload = function () {
     elementClass(element).add('peekcurrent')
   }
   
-  function peek(e) {
-    var pos = positionFromButton(e.target)
+  function peekButtonEvent(e) {
+    var pos = getStepPosition(e.target.parentNode)
     
     markCurrentPeek(e.target.parentNode)
     
+    peekStep(pos)
+  }
+  
+  function peekStep(pos) {
     ssejson.fromEventSource('/sse?peek=' + pos)
-      .pipe(totable($('#result')))
+      .pipe(totable($('#result')))  
   }
   
   var evaluateButton = $('#evaluate')
