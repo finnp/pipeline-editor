@@ -122,7 +122,11 @@ window.onload = function () {
     
     showPeekButtons()
     
-    markCurrentPeek($('#commands li:last-child'))
+    var lastElement = 
+      $('#commands li:not(.hidden):last-child')
+      || $('.source')
+    
+    markCurrentPeek(lastElement)
 
     ssejson.fromEventSource('/sse' + qs)
       .pipe(totable($('#result')))
