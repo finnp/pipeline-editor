@@ -130,16 +130,10 @@ window.onload = function () {
   }
   
   function evaluate() {
-    showButtons('.peek')
-    showButtons('.runfromhere')
+    showButtons('#commands .peek')
+    showButtons('#commands .runfromhere')
     
     runFrom(-1) // 0 is first cache
-    
-    var lastElement = 
-      $('#commands li:last-child')
-      || $('.source')
-    
-    markCurrentPeek(lastElement)
 
     return false
   }
@@ -147,6 +141,9 @@ window.onload = function () {
   function runFrom(pos) {
     var commands = getPipeline()
     var qs = '?position=' + pos + '&commands=' + encodeURIComponent(JSON.stringify(commands))
+    
+    // jump to last step
+    markCurrentPeek($('#commands li:last-child'))
     
     ssejson.fromEventSource('/sse' + qs)
       .pipe(totable($('#result')))
