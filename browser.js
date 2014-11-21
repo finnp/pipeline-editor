@@ -15,6 +15,14 @@ window.onload = function () {
   $('#add').onclick = addRowButtonEvent
   $('#evaluate').onclick = evaluateButtonEvent
   
+  ssejson.fromEventSource('/err').on('data', function (data) {
+    // console.error(data.error)
+    var error = document.createElement('p')
+    var message = document.createTextNode(data.error) 
+    error.appendChild(message)
+    $('#errors').appendChild(error)
+  })
+  
   // Button Events
   
   function exportButtonEvent() {

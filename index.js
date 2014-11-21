@@ -5,6 +5,7 @@ var url = require('url')
 var qs = require('querystring')
 var through = require('through2')
 var ssejson = require('ssejson')
+var stream = require('stream')
 
 module.exports = function (port) {
   var tmp = require('tmp')
@@ -18,6 +19,9 @@ module.exports = function (port) {
     
       if(route === '/sse') 
         return sseRoute(res, reqUrl, tmpPath)
+    
+      if(route === '/err') 
+        return errRoute(res, reqUrl, tmpPath)
       
       if(route === '/')
         return fs.createReadStream(path.resolve(__dirname, 'index.html')).pipe(res)
@@ -25,6 +29,14 @@ module.exports = function (port) {
   })
 }
 
+
+
+var errStream = new stream.PassThrough({objectMode: true})
+function errRoute(res, reqUrl, tmpPath) {
+  res.writeHead(200, {'Content-Type': 'text/event-stream'})
+  errStream.pipe(ssejson.serialize()).pipe(res)
+  // errStream.write({start: true})
+}
 
 
 function peekStep(peekPosition, tmpPath) {
@@ -57,6 +69,10 @@ function runFrom(commands, position, tmpPath) {
   var cachePath = path.resolve(tmpPath, position + '.cache')
   
   var gasketPipeline = require('gasket')(pipeline).run('main')
+  
+  gasketPipeline.on('error', function (error) {
+    errStream.write({error: error.message})
+  })
   
   if(position >= 0)
     return fs.createReadStream(cachePath).pipe(gasketPipeline)
