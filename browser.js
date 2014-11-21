@@ -9,25 +9,23 @@ var $All = document.querySelectorAll.bind(document)
 
 window.onload = function () {
   
-  var exportButton = $('#export')
+  $('#export').onclick = exportButtonEvent
+  $('.peek').onclick = peekButtonEvent
+  $('.runfromhere').onclick = runFromHereButtonEvent
+  $('#add').onclick = addRowButtonEvent
+  $('#evaluate').onclick = evaluateButtonEvent
   
-  // init first peek button
-  var peekButton = $('.peek')
-  peekButton.onclick = peekButtonEvent
+  // Button Events
   
-  var runFromHereButton = $('.runfromhere')
-  runFromHereButton.onclick = runFromHereButtonEvent
-  
-  exportButton.onclick = function () {
+  function exportButtonEvent() {
     var commands = getPipeline()
     saveJSON({main: commands}, 'gasket.json')
   }
 
-  var addRowButton = $('#add')
   
   var tabindex = 1
   
-  addRowButton.onclick = function () {
+  function addRowButtonEvent () {
     var li = $('#step-template li').cloneNode(true)
     var ul = $('#commands')
 
@@ -35,7 +33,7 @@ window.onload = function () {
     li.querySelector('input').setAttribute('tabindex', tabindex)
     
     var removeButton = li.querySelector('.remove')
-    removeButton.onclick = remove.bind(null, ul, li)
+    removeButton.onclick = removeButtonEvent.bind(null, ul, li)
 
      li.querySelector('.peek').onclick = peekButtonEvent
      li.querySelector('.runfromhere').onclick = runFromHereButtonEvent
@@ -44,15 +42,8 @@ window.onload = function () {
     elementClass(li).remove('hidden')
     ul.appendChild(li)
   }
-  
-  function getStepPosition(li) {
-    var pos = -2
-    while (li = li.previousSibling) ++pos
-    if(pos < 0) pos = 0
-    return pos
-  }
 
-  function remove(ul, li, e) {
+  function removeButtonEvent(ul, li, e) {
     var pos = getStepPosition(e.target.parentNode)
     var isCurrent = elementClass(li).has('peekcurrent')
     if(isCurrent) markCurrentPeek(li.previousElementSibling)
@@ -62,14 +53,6 @@ window.onload = function () {
     ul.removeChild(li)
   }
 
-
-  function markCurrentPeek(element) {
-    var lis = $All('#commands li')
-    for(var i = 0; i < lis.length; i++)
-      elementClass(lis[i]).remove('peekcurrent')
-    elementClass(element).add('peekcurrent')
-  }
-  
   function peekButtonEvent(e) {
     var pos = getStepPosition(e.target.parentNode)
     
@@ -83,13 +66,17 @@ window.onload = function () {
     runFrom(pos) 
   }
   
-  function peekStep(pos) {
-    ssejson.fromEventSource('/sse?peek=' + pos)
-      .pipe(totable($('#result')))  
+  function evaluateButtonEvent() {
+    showButtons('#commands .peek')
+    showButtons('#commands .runfromhere')
+    
+    runFrom(-1) // 0 is first cache
+
+    return false
   }
   
-  var evaluateButton = $('#evaluate')
-  
+  //  helper functions
+
   
   function getSourceCmd(source, sourcetype) {
     // TODO: This should be npm command line tools
@@ -129,14 +116,28 @@ window.onload = function () {
     }
   }
   
-  function evaluate() {
-    showButtons('#commands .peek')
-    showButtons('#commands .runfromhere')
-    
-    runFrom(-1) // 0 is first cache
 
-    return false
+  function getStepPosition(li) {
+    var pos = -2
+    while (li = li.previousSibling) ++pos
+    if(pos < 0) pos = 0
+    return pos
   }
+
+
+  function markCurrentPeek(element) {
+    var lis = $All('#commands li')
+    for(var i = 0; i < lis.length; i++)
+      elementClass(lis[i]).remove('peekcurrent')
+    elementClass(element).add('peekcurrent')
+  }
+  
+  
+  function peekStep(pos) {
+    ssejson.fromEventSource('/sse?peek=' + pos)
+      .pipe(totable($('#result')))  
+    }
+
   
   function runFrom(pos) {
     var commands = getPipeline()
@@ -148,8 +149,5 @@ window.onload = function () {
     ssejson.fromEventSource('/sse' + qs)
       .pipe(totable($('#result')))
   }
-
-
-  evaluateButton.onclick = evaluate
 }
 
